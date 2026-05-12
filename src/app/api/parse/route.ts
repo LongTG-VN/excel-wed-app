@@ -2,7 +2,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import JSZip from "jszip";
 import { parseZipFileList } from "@/lib/parser";
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '1000mb', // Nâng lên 10MB hoặc tùy nhu cầu của bạn
+    },
+  },
+};
 
+// Hoặc với phiên bản Next.js mới hơn, đôi khi chỉ cần:
+export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();

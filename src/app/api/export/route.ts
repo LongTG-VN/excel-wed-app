@@ -26,13 +26,13 @@ export async function POST(req: NextRequest) {
 
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
 
-    return new NextResponse(new Uint8Array(zipBuffer), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename="KetQua.zip"`,
-      },
-    });
+   return new NextResponse(new Uint8Array(zipBuffer), {
+  status: 200,
+  headers: {
+    "Content-Type": "application/zip",
+    "Content-Disposition": `attachment; filename="KetQua.zip"`,
+  },
+});
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Lỗi khi tạo file Excel" }, { status: 500 });

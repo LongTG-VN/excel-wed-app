@@ -80,20 +80,31 @@ export default function Home() {
     setLoading(true);
     setResult(null);
 
-    try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/parse", { method: "POST", body: form });
+  try {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/parse", { method: "POST", body: form });
+    
+    // Kiểm tra xem phản hồi có phải JSON không
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Lỗi server");
       setResult(json.data);
-      setActiveTab("anPhu");
-    } catch (e: unknown) {
-      setError((e as Error).message || "Lỗi không xác định");
-    } finally {
-      setLoading(false);
+    } else {
+      // Nếu là text (có thể là lỗi 413 hoặc 504)
+      const text = await res.text();
+      if (text.includes("Request Entity Too Large")) {
+        throw new Error("File ZIP quá lớn, vui lòng chia nhỏ file (Giới hạn 4.5MB)");
+      }
+      throw new Error("Server trả về lỗi không xác định");
     }
-  }, []);
+  } catch (e: any) {
+    setError(e.message);
+  } finally {
+    setLoading(false);
+  }
+}, [])
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
