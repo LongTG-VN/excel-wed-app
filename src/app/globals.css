@@ -1,0 +1,260 @@
+/* globals.css */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #22263a;
+  --border: #2d3148;
+  --accent: #4f8ef7;
+  --accent2: #34d399;
+  --text: #e2e8f0;
+  --text-muted: #8892a4;
+  --error: #f87171;
+  --gold: #fbbf24;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 32px;
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.logo { font-size: 2rem; }
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; }
+
+/* ── Container ── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* ── Drop zone ── */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 48px 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.drop-zone:hover, .drop-zone.dragging {
+  border-color: var(--accent);
+  background: #1e2236;
+}
+.drop-icon { font-size: 3rem; margin-bottom: 12px; }
+.drop-title { font-size: 1.1rem; font-weight: 600; color: #fff; }
+.drop-hint { color: var(--text-muted); font-size: 0.88rem; margin-top: 4px; }
+.drop-note {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.drop-note code {
+  background: var(--surface2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+/* ── Spinner ── */
+.spinner-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.spinner-wrap p { color: var(--text-muted); }
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error box ── */
+.error-box {
+  margin-top: 16px;
+  background: #2d1818;
+  border: 1px solid #7f1d1d;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  color: var(--error);
+  font-size: 0.9rem;
+}
+
+/* ── Result section ── */
+.result-section { margin-top: 32px; }
+
+/* ── Stats ── */
+.stats-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid;
+  border-radius: var(--radius);
+  padding: 16px 24px;
+  min-width: 130px;
+  flex: 1;
+}
+.stat-val { font-size: 2rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+.stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+/* ── Export ── */
+.export-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.btn-export {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: background 0.2s, opacity 0.2s;
+}
+.btn-export:hover { background: #3a7de8; }
+.btn-export:disabled { opacity: 0.5; cursor: not-allowed; }
+.export-note { color: var(--text-muted); font-size: 0.85rem; }
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--text); }
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab.tab-error.active { color: var(--error); border-bottom-color: var(--error); }
+.badge {
+  background: var(--surface2);
+  border-radius: 99px;
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ── Table ── */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+thead th {
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+tbody tr:hover { background: var(--surface2); }
+tbody tr:last-child { border-bottom: none; }
+tbody td {
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+}
+.td-name { font-family: 'IBM Plex Sans', sans-serif !important; color: #fff !important; }
+.td-loai { color: var(--gold) !important; }
+.row-day { background: #1a2220; }
+tfoot .row-total td {
+  background: #1e2c1e;
+  color: var(--accent2);
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 12px 14px;
+  border-top: 2px solid var(--accent2);
+}
+
+/* ── Error list ── */
+.error-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 16px;
+}
+.error-list ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.error-list li {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--error);
+  background: #2d1818;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border-left: 3px solid var(--error);
+}
+.empty-msg {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted);
+}
