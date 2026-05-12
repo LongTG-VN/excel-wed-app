@@ -1,13 +1,15 @@
-// next.config.js
+/** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 1. Xóa key 'api' cũ gây lỗi ở đây (nếu có)
+
+  // 2. Bỏ qua lỗi ESLint khi build
   eslint: {
-    // Bỏ qua lỗi ESLint khi build
-    ignoreDuringBuilds: true, 
+    ignoreDuringBuilds: true,
   },
+  // 3. Bỏ qua lỗi TypeScript khi build
   typescript: {
-    // Bỏ qua lỗi TypeScript khi build
     ignoreBuildErrors: true,
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
