@@ -2,7 +2,8 @@
 
 import { useState, useRef, useCallback } from "react";
 import { FileEntry, ParseResult } from "@/lib/parser";
-
+import JSZip from "jszip"; // Import thêm jszip ở client
+import { parseZipFileList } from "@/lib/parser";
 type Tab = "anPhu" | "anPhuOther" | "caiDau" | "caiDauOther" | "errors";
 
 function calcDT(e: FileEntry) {
@@ -72,39 +73,38 @@ export default function Home() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const processFile = useCallback(async (file: File) => {
-    if (!file.name.endsWith(".zip")) {
-      setError("Vui lòng upload file ZIP chứa các folder ngày tháng.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    setResult(null);
+  if (!file.name.endsWith(".zip")) {
+    setError("Vui lòng upload file ZIP.");
+    return;
+  }
+  setError("");
+  setLoading(true);
 
   try {
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/parse", { method: "POST", body: form });
-    
-    // Kiểm tra xem phản hồi có phải JSON không
-    const contentType = res.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Lỗi server");
-      setResult(json.data);
-    } else {
-      // Nếu là text (có thể là lỗi 413 hoặc 504)
-      const text = await res.text();
-      if (text.includes("Request Entity Too Large")) {
-        throw new Error("File ZIP quá lớn, vui lòng chia nhỏ file (Giới hạn 4.5MB)");
+    // 1. Đọc file trực tiếp tại Client
+    const arrayBuffer = await file.arrayBuffer();
+    const zip = await JSZip.loadAsync(arrayBuffer);
+    const rootName = file.name.replace(/\.zip$/i, "");
+
+    const filePaths: string[] = [];
+    zip.forEach((relativePath, zipEntry) => {
+      if (!zipEntry.dir && !relativePath.includes(".git/")) {
+        filePaths.push(relativePath);
       }
-      throw new Error("Server trả về lỗi không xác định");
-    }
+    });
+
+    // 2. Chạy logic parse (Hàm này giờ chạy ở máy người dùng)
+    const result = parseZipFileList(filePaths, rootName);
+
+    // 3. Cập nhật state (Không cần qua API /api/parse nữa)
+    setResult(result);
+    setActiveTab("anPhu");
   } catch (e: any) {
-    setError(e.message);
+    setError("Lỗi xử lý file: " + e.message);
   } finally {
     setLoading(false);
   }
-}, [])
+}, []);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
