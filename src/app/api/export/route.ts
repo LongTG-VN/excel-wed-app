@@ -1,40 +1,42 @@
-// app/api/export/route.ts
+// src/app/api/export/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import JSZip from "jszip";
-import { buildExcelBuffer } from "@/lib/excelExporter";
-import { ParseResult } from "@/lib/parser";
+import fs from "fs";
+import path from "path";
+import { buildExcelFromTemplate } from "@/lib/excelExporter";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as { data: ParseResult; rootName?: string };
-    const { data } = body;
+    const body = await req.json();
+    const { orders, templateBase64 } = body;
 
-    if (!data) {
-      return NextResponse.json({ error: "Không có dữ liệu" }, { status: 400 });
+    if (!orders || !Array.isArray(orders)) {
+      return NextResponse.json({ error: "Dữ liệu orders không hợp lệ." }, { status: 400 });
     }
 
-    // Tạo 2 file Excel song song
-    const [anPhuBuf, caiDauBuf] = await Promise.all([
-      buildExcelBuffer(data.anPhu, data.anPhuOther),
-      buildExcelBuffer(data.caiDau, data.caiDauOther),
-    ]);
+    let templateBuffer: Buffer;
+    if (templateBase64) {
+      // Use custom uploaded template
+      templateBuffer = Buffer.from(templateBase64, "base64");
+    } else {
+      // Use default template from public directory
+      const templatePath = path.join(process.cwd(), "public", "template.xlsx");
+      if (!fs.existsSync(templatePath)) {
+        return NextResponse.json({ error: "Không tìm thấy file template mặc định." }, { status: 500 });
+      }
+      templateBuffer = fs.readFileSync(templatePath);
+    }
 
-    // Đóng gói vào ZIP
-    const zip = new JSZip();
-    zip.file("AnPhu.xlsx", anPhuBuf);
-    zip.file("CaiDau.xlsx", caiDauBuf);
+    const excelBuffer = await buildExcelFromTemplate(orders, templateBuffer);
 
-    const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
-
-   return new NextResponse(new Uint8Array(zipBuffer), {
-  status: 200,
-  headers: {
-    "Content-Type": "application/zip",
-    "Content-Disposition": `attachment; filename="KetQua.zip"`,
-  },
-});
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Lỗi khi tạo file Excel" }, { status: 500 });
+    return new NextResponse(excelBuffer, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition": `attachment; filename="KetQua.xlsx"`,
+      },
+    });
+  } catch (err: any) {
+    console.error("Export error:", err);
+    return NextResponse.json({ error: `Lỗi khi xuất file Excel: ${err.message}` }, { status: 500 });
   }
 }
